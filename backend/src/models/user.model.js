@@ -1,28 +1,28 @@
-import mongoose,{Schema} from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 
-const userschema=new Schema({
-    userName:{
+const userschema = new Schema({
+    userName: {
         type: String,
-        unique:true,
-        require:true,
+        unique: true,
+        require: true,
     },
-    email:{
+    email: {
         type: String,
-        require:true,
-        unique:true,
+        require: true,
+        unique: true,
     },
-    password:{
+    password: {
         type: String,
 
-        require:true,
+        require: true,
     },
-    userImage:{
+    userImage: {
         type: String,
         default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1fYaY9LEjaK0yhT3WsncM36y6MD9sLCHU4A&s",
     }
-},{timestamps: true})
+}, { timestamps: true })
 
-const user=mongoose.model('User', userschema);
+const user = mongoose.model('User', userschema);
 
 export default user;

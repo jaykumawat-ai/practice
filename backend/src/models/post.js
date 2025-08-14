@@ -1,31 +1,31 @@
-import mongoose,{Schema} from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 
-const postschema=new Schema({
-    title:{
+const postschema = new Schema({
+    title: {
         type: String,
-        require:true,
+        require: true,
     },
-    content:{
+    content: {
         type: String,
-        unique:true,
+        unique: true,
     },
-    userID:{
-        type:mongoose.Types.ObjectId,
-        ref:"user",
-        require:true,
+    userID: {
+        type: mongoose.Types.ObjectId,
+        ref: "user",
+        require: true,
     },
-    postImage:{
+    postImage: {
         type: String,
         default: "https://cdn.wallpapersafari.com/51/76/3TFfqI.jpg",
     },
-    slug:{
-        type:String,
-        require:true,
-        unique:true,
+    slug: {
+        type: String,
+        require: true,
+        unique: true,
     }
-},{timestamps: true})
+}, { timestamps: true })
 
-const post=mongoose.model('post', postschema);
+const post = mongoose.model('post', postschema);
 
 export default post;
