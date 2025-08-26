@@ -4,7 +4,6 @@ import mongoose, { Schema } from 'mongoose';
 const commentschema = new Schema({
     content: {
         type: String,
-        unique: true,
     },
     userID: {
         type: mongoose.Types.ObjectId,
@@ -13,7 +12,7 @@ const commentschema = new Schema({
     },
     postid: {
         type: mongoose.Types.ObjectId,
-        ref: "user",
+        ref: "post",
         require: true,
     },
     likes: {

@@ -2,9 +2,10 @@ import validator from "validator"
 import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
-import { ApiError } from "../utils/ApiError.js";
+import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js"
 import User from "../models/user.model.js"
+
 const register = async (req, res) => {
     //logic
     try {
@@ -58,37 +59,54 @@ const register = async (req, res) => {
             201, saveduser, "user created successfully"
         ))
     } catch (error) {
-        throw new ApiError("something went wrong ", error)
-    }
+    throw new ApiError("something went wrong ", error)
+}
 }
 
 
 const signIn = async (req, res) => {
     try {
-        const { userName, email, password } = req.body
+        const { userName, email, password } = req.body;
+
+        console.log(req.body);
+
         if (!userName || !email || !password) {
+            console.log("in the if condition");
+
             throw new ApiError(400, "all fields are required")
         }
+
         if (!validator.isEmail(email)) {
             throw new ApiError(400, "email invalid ")
         }
-        const isExistUser = await User.findOne({ $or: [{ userName: userName.trim() }, { email: email.trim() }] })
+
+        const isExistUser = await User.findOne({ $or: [{ userName: userName.trim() }, { email: email.trim() }] });
+
         if (!isExistUser) {
             throw new ApiError(400, "user not found")
         }
-        const cmpppass = bcrypt.compareSync(password, isExistUser.password);
-        if (!cmpppass) {
+
+        const comparePass = bcrypt.compareSync(password, isExistUser.password);
+
+        if (!comparePass) {
             throw new ApiError(400, "Invalid password")
         }
-        const token = jwt.sign({ id: isExistUser }, process.env.ACCESS_TOKEN_SECRET);
+
+        const token = jwt.sign({ id: isExistUser._id },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: process.env.ACCESS_TOKEN_EXPIRY });
+
         if (!token) {
             throw new ApiError(400, "token not found")
         }
+
         const loggedInUser = await User.findById(isExistUser._id).select("-password")
+
         const options = {
             httpOnly: true,
             secure: false,
         }
+
         return res.status(200)
             .cookie("accessToken", token, options)
             .json(new ApiResponse(
@@ -102,17 +120,24 @@ const signIn = async (req, res) => {
 
 
     } catch (error) {
-        throw new ApiResponse(400, error)
+        throw new ApiError(400, error.message)
     }
-
-
-
-
-
-
 }
 
 const signOut = async (req, res) => {
     // logic
+    try {
+        const option = {
+            httpOnly: true,
+            secure: false,
+        }
+
+        return res.status(200)
+            .clearCookie("accessToken", option)
+            .json(new ApiResponse(200, {}, "user logout successfully"))
+    } catch (error) {
+        throw new ApiError(400, error.message);
+    }
 }
+
 export { register, signIn, signOut }
